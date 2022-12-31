@@ -1,32 +1,45 @@
-import { Navbar } from "flowbite-react";
-import React from "react";
+import { Button, Navbar } from "flowbite-react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import icon from "../../assets/favicon.ico";
+import { authContext } from "../../Context/Contexts";
 
 const Header = () => {
+  const { user, logOut } = useContext(authContext);
+
+  const handleLogOut = () =>{
+    logOut()
+    .then(res => {
+      console.log(res)
+    })
+  }
+
   return (
     <div>
       <Navbar className="max-w-7xl mx-auto  mb-10" fluid={true} rounded={true}>
-        <Navbar.Brand href="https://flowbite.com/">
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="mr-3 h-6 sm:h-9"
-            alt="Flowbite Logo"
-          />
+       <Link to='/'> <Navbar.Brand href="#">
+          <img src={icon} className="mr-3 h-6 sm:h-9" alt="Flowbite Logo" />
           <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
             Task-Manager
           </span>
-        </Navbar.Brand>
+        </Navbar.Brand></Link>
         <Navbar.Toggle />
         <Navbar.Collapse>
-          {/* <Navbar.Link href="/navbars" active={true}>
-            Home
-          </Navbar.Link> */}
-          <Link to="/addtask">Add Task</Link>
-          <Link to="/mytask">My Task</Link>
-          <Link to="/completedtask">Completed Task</Link>
-          <Link to="/completedtask">Media</Link>
+          {user?.email ? (
+            <>
+              <Link to="/">Home</Link>
+              <Link to="/addtask">Add Task</Link>
+              <Link to="/mytask">My Task</Link>
+              <Link to="/completedtask">Completed Task</Link>
+              <Link to="/media">Media</Link>
+              <Link onClick={handleLogOut} >Log Out</Link>
 
-          
+              
+            </>
+          ) : (
+            <Link to="/login"> <Button color="success">Login</Button></Link>
+           
+          )}
         </Navbar.Collapse>
       </Navbar>
     </div>

@@ -1,6 +1,5 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Foot from "../Components/Footer/Foot";
 import Header from "../Components/Navbar/Header";
 
 const Main = () => {
@@ -10,7 +9,7 @@ const Main = () => {
       <div className="max-w-6xl m-auto">
         <Outlet></Outlet>
       </div>
-      <Foot></Foot>
+      
     </div>
   );
 };
