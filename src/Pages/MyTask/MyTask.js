@@ -1,14 +1,19 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Spinner } from "flowbite-react";
+import { Button, Modal, Spinner } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
 import { authContext } from "../../Context/Contexts";
 
 const MyTask = () => {
   const { user, loading } = useContext(authContext);
   const [tasks, setTasks] = useState([]);
+  const [updatedTask, setUpdatedTasks] = useState([]);
   const [show, setShow] = useState(false);
   const [loader, setLoader] = useState(true);
+  const [taskHeader, setTaskHeader] = useState("");
+  const [updatedTaskHeader, setUpdatedTaskHeader] = useState("");
+  const [myTask, setTask] = useState("");
+
   useEffect(() => {
     fetch(
       `https://task-manager-server-side.vercel.app/myTask?email=${user?.email}`
@@ -19,7 +24,7 @@ const MyTask = () => {
         setLoader(false);
         setTasks(data);
       });
-  }, [user?.email]);
+  }, [user?.email, loader]);
 
   const handleDelete = (id) => {
     console.log(id);
@@ -37,10 +42,6 @@ const MyTask = () => {
           setTasks(reamining);
         }
       });
-  };
-
-  const handleUpdate = (id) => {
-    console.log(id);
   };
 
   const completedTaskHandler = (id) => {
@@ -77,6 +78,35 @@ const MyTask = () => {
               setTasks(reamining);
             }
           });
+      });
+  };
+
+  // const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  // const onSubmit = data => console.log(data);
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    e.target.reset();
+  };
+
+  const handleUpdates = () => {
+    console.log(show);
+    console.log(taskHeader, myTask);
+
+    fetch(`http://localhost:5000/updatedtask/${show}`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        task: updatedTask,
+        taskHeader: updatedTaskHeader,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setShow(false);
       });
   };
 
@@ -117,33 +147,86 @@ const MyTask = () => {
             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400"></p>
             <p className="h-32 overflow-y-scroll"> {task.task}</p>
             <div className="flex absolute bottom-5">
-              <Button className="mt-5" onClick={() => setShow(task._id)}>
+              <Button
+                className="mt-5"
+                onClick={() => {
+                  setShow(task._id);
+                  setTaskHeader(task.taskHeader);
+                  setTask(task.task);
+                }}
+              >
                 Update
               </Button>
-             
-
-              {/* <React.Fragment>
-                <Modal show={show} onClose={() => setShow(!show)}>
-                  <Modal.Header>Terms of Service</Modal.Header>
+              <React.Fragment>
+                <Modal
+                  show={show}
+                  onClose={() => {
+                    setShow(!show);
+                  }}
+                >
+                  <Modal.Header>Update your task:</Modal.Header>
                   <Modal.Body>
                     <div className="space-y-6">
-                      <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                        {task.task}
-                      </p>
-                      <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                        {task.taskHeader}
-                      </p>
+                      <form onSubmit={handleUpdate}>
+                        <div>
+                          <label
+                            for="first_name"
+                            class="block mb-3 text-md  font-bold text-gray-900 dark:text-white"
+                          >
+                            Task Header
+                          </label>
+
+                          <input
+                            type="text"
+                            name="taskHeader"
+                            onChange={(e) => {
+                              setUpdatedTaskHeader(e.target.value);
+                            }}
+                            id="first_name"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="Type Your Task"
+                            defaultValue={taskHeader}
+                            required
+                          />
+                          <div>
+                            <label
+                              for="first_name"
+                              class="block my-3 mt-5 text-md  font-bold text-gray-900 dark:text-white"
+                            >
+                              Task Details
+                            </label>
+                            <input
+                              type="text"
+                              name="task"
+                              onChange={(e) => {
+                                setUpdatedTasks(e.target.value);
+                              }}
+                              defaultValue={myTask}
+                              id="first_name"
+                              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              placeholder="task"
+                              required
+                              // {...register("task")}
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          type="submit"
+                          onClick={() => {
+                            // setTaskHeader(task.taskHeader);
+                            // setTask(task.task);
+                            setLoader(!loader);
+                            handleUpdates(task._id);
+                          }}
+                          className="my-5"
+                        >
+                          Update Task
+                        </Button>
+                      </form>
                     </div>
                   </Modal.Body>
-                  <Modal.Footer>
-                    <Button onClick={() => setShow(!show)}>I accept</Button>
-                    <Button color="gray" onClick={() => setShow(!show)}>
-                      Decline
-                    </Button>
-                  </Modal.Footer>
                 </Modal>
-              </React.Fragment>  */}
-
+              </React.Fragment>{" "}
               <Button
                 onClick={() => completedTaskHandler(task._id)}
                 className="mt-5 ml-3"
@@ -157,7 +240,6 @@ const MyTask = () => {
       </div>
 
       <div></div>
-     
     </div>
   );
 };

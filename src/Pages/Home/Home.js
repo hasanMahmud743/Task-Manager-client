@@ -2,7 +2,6 @@ import { Button } from "flowbite-react";
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { authContext } from "../../Context/Contexts";
-import Modal from "../Modal";
 
 const Home = () => {
   const { user } = useContext(authContext);
@@ -40,7 +39,7 @@ const Home = () => {
     <div>
       <p className="font-bold text-center text-3xl">Welcome to Task Manager</p>
       <p className="text-center text-xl font-bold">No way to forget again </p>
-      <Modal></Modal>
+      
 
       <div className="grid md:grid-cols-3 gap-5 m-5 mt-10">
         <div>
